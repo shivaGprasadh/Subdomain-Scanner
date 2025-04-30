@@ -1,5 +1,5 @@
 from datetime import datetime
-from app import db
+from database import db
 
 class ScanHistory(db.Model):
     __tablename__ = 'scan_history'

@@ -13,8 +13,6 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 from flask import Flask, render_template, request, jsonify, make_response, redirect, url_for, flash, send_file
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -32,17 +30,15 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
 }
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-# Define database model base class
-class Base(DeclarativeBase):
-    pass
+# Import database module and models
+from database import db
+import models
 
-# Initialize database
-db = SQLAlchemy(model_class=Base)
+# Initialize database with app
 db.init_app(app)
 
-# Import models (after app and db are created)
+# Create all tables
 with app.app_context():
-    from models import ScanHistory, ScanResult
     db.create_all()
 
 # Add current year to all templates
@@ -224,36 +220,34 @@ class SubdomainScanner:
     
     def _save_to_database(self):
         """Save scan results to database"""
-        # Import models here to avoid circular import
         from models import ScanHistory, ScanResult
         
         try:
-            with app.app_context():
-                # Create scan history record
-                scan_history = ScanHistory(
-                    domain=self.domain,
-                    active_count=len(self.active_domains),
-                    inactive_count=len(self.inactive_domains),
-                    total_count=len(self.scan_results)
+            # Create scan history record
+            scan_history = ScanHistory(
+                domain=self.domain,
+                active_count=len(self.active_domains),
+                inactive_count=len(self.inactive_domains),
+                total_count=len(self.scan_results)
+            )
+            db.session.add(scan_history)
+            db.session.flush()  # Flush to get the ID
+            
+            # Create scan result records
+            for result in self.scan_results:
+                scan_result = ScanResult(
+                    scan_id=scan_history.id,
+                    subdomain=result['domain'],
+                    is_active=result['is_active'],
+                    response_info=result['response_info'],
+                    timestamp=datetime.strptime(result['timestamp'], "%Y-%m-%d %H:%M:%S")
                 )
-                db.session.add(scan_history)
-                db.session.flush()  # Flush to get the ID
-                
-                # Create scan result records
-                for result in self.scan_results:
-                    scan_result = ScanResult(
-                        scan_id=scan_history.id,
-                        subdomain=result['domain'],
-                        is_active=result['is_active'],
-                        response_info=result['response_info'],
-                        timestamp=datetime.strptime(result['timestamp'], "%Y-%m-%d %H:%M:%S")
-                    )
-                    db.session.add(scan_result)
-                
-                # Commit the transaction
-                db.session.commit()
-                logger.info(f"Saved scan results to database. Scan ID: {scan_history.id}")
-                
+                db.session.add(scan_result)
+            
+            # Commit the transaction
+            db.session.commit()
+            logger.info(f"Saved scan results to database. Scan ID: {scan_history.id}")
+            
         except Exception as e:
             logger.exception("Error saving scan results to database")
             db.session.rollback()
