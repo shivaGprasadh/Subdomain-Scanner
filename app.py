@@ -73,15 +73,14 @@ class SubdomainScanner:
         self.scan_in_progress = True
         
         try:
-            # Check if subfinder and dnsx are installed
+            # Check if subfinder is installed
             has_subfinder = subprocess.run(["which", "subfinder"], stdout=subprocess.PIPE, stderr=subprocess.PIPE).returncode == 0
-            has_dnsx = subprocess.run(["which", "dnsx"], stdout=subprocess.PIPE, stderr=subprocess.PIPE).returncode == 0
             
-            if has_subfinder and has_dnsx:
-                # Run subfinder and dnsx commands
+            if has_subfinder:
+                # Run subfinder command
                 logger.debug(f"Starting subdomain scan for {domain}")
                 process = subprocess.Popen(
-                    f"subfinder -silent -d {domain} | dnsx -silent",
+                    f"subfinder -silent -d {domain}",
                     shell=True,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
@@ -98,8 +97,8 @@ class SubdomainScanner:
                 # Process the output - split by lines and remove empty lines
                 subdomains = [line.strip() for line in stdout.split('\n') if line.strip()]
             else:
-                # If tools are not available, use common subdomain prefixes
-                logger.warning("subfinder and/or dnsx not installed. Using built-in subdomain list")
+                # If tool is not available, use common subdomain prefixes
+                logger.warning("subfinder not installed. Using built-in subdomain list")
                 common_subdomains = ["www", "api", "mail", "blog", "shop", "store", "admin", "dev", "test", "app", "m"]
                 subdomains = [f"{prefix}.{domain}" for prefix in common_subdomains]
                 

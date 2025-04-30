@@ -22,7 +22,7 @@
                     <li>Python 3.6+ installed on your system</li>
                     <li>pip (Python package manager)</li>
                     <li>PostgreSQL database (or SQLite for simpler setup)</li>
-                    <li>Subfinder and dnsx tools (optional, enhances scanning capabilities)</li>
+                    <li>Subfinder tool (optional, enhances scanning capabilities)</li>
                 </ul>
 
                 <h4 class="mt-4 mb-3">Option 1: Automated Installation (Recommended)</h4>
@@ -213,19 +213,16 @@ FLASK_SECRET_KEY=your_secret_key</pre>
                 </div>
 
                 <h4 class="mt-4 mb-3">Step 4: Install Additional Tools (Optional)</h4>
-                <p>For enhanced subdomain discovery, install Subfinder and dnsx:</p>
+                <p>For enhanced subdomain discovery, install Subfinder:</p>
                 
                 <div class="alert alert-secondary">
                     <h6>macOS</h6>
                     <div class="code-block bg-dark text-light p-3 rounded">
-                        <pre># Install Go (required for Subfinder and dnsx)
+                        <pre># Install Go (required for Subfinder)
 brew install go
 
 # Install Subfinder
 go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
-
-# Install dnsx
-go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest
 
 # Make sure $GOPATH/bin is in your PATH
 echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> ~/.zshrc  # or ~/.bash_profile
@@ -236,14 +233,11 @@ source ~/.zshrc  # or ~/.bash_profile</pre>
                 <div class="alert alert-secondary">
                     <h6>Linux</h6>
                     <div class="code-block bg-dark text-light p-3 rounded">
-                        <pre># Install Go (required for Subfinder and dnsx)
+                        <pre># Install Go (required for Subfinder)
 sudo apt install golang-go
 
 # Install Subfinder
 go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
-
-# Install dnsx
-go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest
 
 # Make sure $GOPATH/bin is in your PATH
 echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> ~/.bashrc
