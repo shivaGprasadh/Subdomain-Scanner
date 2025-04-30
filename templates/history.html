@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Scan History{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary">
+                <h3 class="card-title text-white mb-0">
+                    <i class="fas fa-history me-2"></i>Scan History
+                </h3>
+            </div>
+            <div class="card-body">
+                {% if scan_histories %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover datatable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Domain</th>
+                                <th>Date</th>
+                                <th>Active Domains</th>
+                                <th>Inactive Domains</th>
+                                <th>Total</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for history in scan_histories %}
+                            <tr>
+                                <td>{{ history.id }}</td>
+                                <td>{{ history.domain }}</td>
+                                <td>{{ history.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                <td><span class="badge bg-success">{{ history.active_count }}</span></td>
+                                <td><span class="badge bg-danger">{{ history.inactive_count }}</span></td>
+                                <td>{{ history.total_count }}</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ url_for('history_detail', scan_id=history.id) }}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-search me-1"></i>View Details
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ history.id }}">
+                                            <i class="fas fa-trash-alt me-1"></i>Delete
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Delete Confirmation Modal -->
+                                    <div class="modal fade" id="deleteModal{{ history.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ history.id }}" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header bg-danger text-white">
+                                                    <h5 class="modal-title" id="deleteModalLabel{{ history.id }}">
+                                                        <i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Are you sure you want to delete scan history for <strong>{{ history.domain }}</strong>?</p>
+                                                    <p class="text-danger">This action cannot be undone and will delete all {{ history.total_count }} subdomain results.</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <form action="{{ url_for('delete_history', scan_id=history.id) }}" method="POST">
+                                                        <button type="submit" class="btn btn-danger">
+                                                            <i class="fas fa-trash-alt me-1"></i>Yes, Delete
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <p>No scan history available. Run a scan first!</p>
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">
+                        <i class="fas fa-search me-1"></i> Go to Scanner
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize DataTables when the document is ready
+    $(document).ready(function() {
+        $('.datatable').DataTable({
+            responsive: true,
+            pageLength: 25,
+            order: [[2, 'desc']],  // Sort by date (column 2) descending
+            language: {
+                search: "Filter:",
+                lengthMenu: "Show _MENU_ entries",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries"
+            }
+        });
+    });
+</script>
+{% endblock %}

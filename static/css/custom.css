@@ -1,0 +1,73 @@
+/* Custom styles for the application */
+
+/* Body styles */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Make footer stick to bottom */
+.footer {
+    margin-top: auto;
+}
+
+/* Custom styling for cards */
+.card {
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+}
+
+/* Improve table readability */
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.datatable {
+    width: 100% !important;
+}
+
+/* Style inactive domains */
+.text-decoration-line-through {
+    text-decoration: line-through;
+}
+
+/* Custom styling for tabs */
+.nav-tabs .nav-link {
+    border-radius: 0.5rem 0.5rem 0 0;
+    padding: 0.75rem 1.25rem;
+    font-weight: 500;
+}
+
+.nav-tabs .nav-link.active {
+    background-color: var(--bs-gray-800);
+    border-color: var(--bs-gray-700);
+    border-bottom-color: transparent;
+}
+
+/* Improve code block readability */
+code {
+    background-color: var(--bs-gray-800);
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+}
+
+/* Responsive improvements */
+@media (max-width: 576px) {
+    .card-header .btn {
+        margin-top: 0.5rem;
+    }
+    
+    .card-header .d-flex {
+        flex-direction: column;
+        align-items: start !important;
+    }
+}

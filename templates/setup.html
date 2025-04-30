@@ -1,0 +1,345 @@
+{% extends 'base.html' %}
+
+{% block title %}Subdomain Scanner Setup{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary">
+                <h3 class="card-title text-white mb-0">
+                    <i class="fas fa-cogs me-2"></i>Setup Guide
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    This guide covers installation and setup for both macOS and Linux environments.
+                </div>
+
+                <h4 class="mt-4 mb-3">Prerequisites</h4>
+                <ul>
+                    <li>Python 3.6+ installed on your system</li>
+                    <li>pip (Python package manager)</li>
+                    <li>PostgreSQL database (or SQLite for simpler setup)</li>
+                    <li>Subfinder and dnsx tools (optional, enhances scanning capabilities)</li>
+                </ul>
+
+                <h4 class="mt-4 mb-3">Option 1: Automated Installation (Recommended)</h4>
+                
+                <div class="alert alert-success">
+                    <i class="fas fa-magic me-2"></i>
+                    <strong>Easiest Option:</strong> Use our automated installation scripts that work on both macOS and Linux.
+                </div>
+                
+                <h5>Full Installation Script</h5>
+                <p>This script installs all dependencies, sets up the database, and optionally installs the scanning tools:</p>
+                <div class="code-block bg-dark text-light p-3 rounded">
+                    <pre># Clone the repository
+git clone https://github.com/yourusername/subdomain-scanner.git
+cd subdomain-scanner
+
+# Make the installation script executable and run it
+chmod +x install.sh
+./install.sh</pre>
+                </div>
+                
+                <h5>Simple Installation Script</h5>
+                <p>A minimal script that only installs Python dependencies and sets up SQLite:</p>
+                <div class="code-block bg-dark text-light p-3 rounded">
+                    <pre># Clone the repository
+git clone https://github.com/yourusername/subdomain-scanner.git
+cd subdomain-scanner
+
+# Make the simple installation script executable and run it
+chmod +x simple_install.sh
+./simple_install.sh</pre>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>What these scripts do:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>Create a Python virtual environment</li>
+                        <li>Install all required Python packages</li>
+                        <li>Configure SQLite database (automatic creation)</li>
+                        <li>Generate a secure random secret key</li>
+                        <li>Create convenient scripts to run the application</li>
+                    </ul>
+                </div>
+                
+                <h4 class="mt-4 mb-3">Option 2: Manual Installation</h4>
+                <p>If you prefer to install everything manually, follow these steps:</p>
+                
+                <h5>Step 1: Clone the Repository</h5>
+                <div class="code-block bg-dark text-light p-3 rounded">
+                    <pre>git clone https://github.com/yourusername/subdomain-scanner.git
+cd subdomain-scanner</pre>
+                </div>
+
+                <h5>Step 2: Install Python Dependencies</h5>
+                <div class="code-block bg-dark text-light p-3 rounded">
+                    <pre>pip install -r requirements.txt</pre>
+                </div>
+                <p>Or install dependencies individually:</p>
+                <div class="code-block bg-dark text-light p-3 rounded">
+                    <pre>pip install flask flask-sqlalchemy psycopg2-binary gunicorn email-validator python-dotenv</pre>
+                </div>
+
+                <h4 class="mt-4 mb-3">Step 3: Database Setup</h4>
+
+                <ul class="nav nav-tabs" id="databaseTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="sqlite-tab" data-bs-toggle="tab" data-bs-target="#sqlite" type="button" role="tab">SQLite (Recommended)</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="postgres-tab" data-bs-toggle="tab" data-bs-target="#postgres" type="button" role="tab">PostgreSQL</button>
+                    </li>
+                </ul>
+                <div class="tab-content mt-3" id="databaseTabsContent">
+                    <div class="tab-pane fade" id="postgres" role="tabpanel">
+                        <h5>PostgreSQL Installation</h5>
+                        
+                        <div class="alert alert-secondary">
+                            <h6>macOS</h6>
+                            <p>Using Homebrew:</p>
+                            <div class="code-block bg-dark text-light p-3 rounded">
+                                <pre># Install PostgreSQL
+brew install postgresql
+
+# Start PostgreSQL service
+brew services start postgresql</pre>
+                            </div>
+                            <p>Or using Postgres.app (easier):</p>
+                            <ol>
+                                <li>Download <a href="https://postgresapp.com/" target="_blank">Postgres.app</a></li>
+                                <li>Move to Applications folder and open it</li>
+                                <li>Click "Initialize" to create a new server</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="alert alert-secondary">
+                            <h6>Linux (Ubuntu/Debian)</h6>
+                            <div class="code-block bg-dark text-light p-3 rounded">
+                                <pre># Update package list
+sudo apt update
+
+# Install PostgreSQL and development libraries
+sudo apt install postgresql postgresql-contrib libpq-dev
+
+# Start PostgreSQL service
+sudo systemctl start postgresql
+sudo systemctl enable postgresql</pre>
+                            </div>
+                        </div>
+                        
+                        <h5 class="mt-3">Create Database and User</h5>
+                        <div class="code-block bg-dark text-light p-3 rounded">
+                            <pre># Access PostgreSQL command line
+sudo -u postgres psql
+
+# Inside PostgreSQL shell, create a database and user
+CREATE DATABASE subdomain_scanner;
+CREATE USER scanner_user WITH PASSWORD 'your_password';
+GRANT ALL PRIVILEGES ON DATABASE subdomain_scanner TO scanner_user;
+\q</pre>
+                        </div>
+                        
+                        <h5 class="mt-3">Configure Environment Variables</h5>
+                        <p>Create a <code>.env</code> file in the project root:</p>
+                        <div class="code-block bg-dark text-light p-3 rounded">
+                            <pre>DATABASE_URL=postgresql://scanner_user:your_password@localhost/subdomain_scanner
+FLASK_SECRET_KEY=your_secret_key</pre>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane fade show active" id="sqlite" role="tabpanel">
+                        <h5>SQLite Setup (Recommended)</h5>
+                        <p>SQLite requires no installation as it's included with Python. This is the recommended option for both macOS and Linux users for simplicity:</p>
+                        
+                        <div class="alert alert-warning">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            <strong>Pro Tip:</strong> SQLite works identically on both macOS and Linux. The setup steps below are exactly the same for both operating systems.
+                        </div>
+                        
+                        <h6>Step 1: Create a .env file</h6>
+                        <div class="code-block bg-dark text-light p-3 rounded">
+                            <pre># Create a .env file in the project root
+touch .env
+
+# Edit .env and add these lines
+DATABASE_URL=sqlite:///subdomain_scanner.db
+FLASK_SECRET_KEY=your_secret_key</pre>
+                        </div>
+                        
+                        <h6>Step 2: Make sure python-dotenv is installed</h6>
+                        <div class="code-block bg-dark text-light p-3 rounded">
+                            <pre>pip install python-dotenv</pre>
+                        </div>
+                        
+                        <h6>Step 3: Load environment variables</h6>
+                        <p>The application is already configured to load variables from .env automatically using the python-dotenv package.</p>
+                        
+                        <h6>Step 4: Database Creation (Automatic)</h6>
+                        <div class="alert alert-success mt-3">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <strong>No manual database creation required!</strong> SQLite database files are created automatically when the application runs for the first time.
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <p><strong>How SQLite Database Creation Works:</strong></p>
+                            <ol class="mb-0">
+                                <li>When you set <code>DATABASE_URL=sqlite:///subdomain_scanner.db</code> in your .env file, you're specifying the path for the database file</li>
+                                <li>When the application starts, SQLAlchemy checks if this file exists</li>
+                                <li>If the file doesn't exist, SQLAlchemy creates it automatically</li>
+                                <li>The application then creates all necessary tables defined in your models</li>
+                                <li>No additional steps required - everything happens automatically!</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Why use SQLite?</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Zero configuration - no server required</li>
+                                <li>File-based database - easy to backup and transfer</li>
+                                <li>Identical setup for macOS and Linux</li>
+                                <li>Ideal for development and smaller deployments</li>
+                                <li>No need to install or configure a database server</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="mt-4 mb-3">Step 4: Install Additional Tools (Optional)</h4>
+                <p>For enhanced subdomain discovery, install Subfinder and dnsx:</p>
+                
+                <div class="alert alert-secondary">
+                    <h6>macOS</h6>
+                    <div class="code-block bg-dark text-light p-3 rounded">
+                        <pre># Install Go (required for Subfinder and dnsx)
+brew install go
+
+# Install Subfinder
+go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
+
+# Install dnsx
+go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest
+
+# Make sure $GOPATH/bin is in your PATH
+echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> ~/.zshrc  # or ~/.bash_profile
+source ~/.zshrc  # or ~/.bash_profile</pre>
+                    </div>
+                </div>
+                
+                <div class="alert alert-secondary">
+                    <h6>Linux</h6>
+                    <div class="code-block bg-dark text-light p-3 rounded">
+                        <pre># Install Go (required for Subfinder and dnsx)
+sudo apt install golang-go
+
+# Install Subfinder
+go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
+
+# Install dnsx
+go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest
+
+# Make sure $GOPATH/bin is in your PATH
+echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> ~/.bashrc
+source ~/.bashrc</pre>
+                    </div>
+                </div>
+
+                <h4 class="mt-4 mb-3">Step 5: Run the Application</h4>
+                <div class="code-block bg-dark text-light p-3 rounded">
+                    <pre># Load environment variables
+source .env  # On Linux/macOS
+
+# Run with Gunicorn (production)
+gunicorn --bind 0.0.0.0:5003 main:app
+
+# Or run with Flask for development
+python main.py</pre>
+                </div>
+
+                <div class="alert alert-success mt-3">
+                    <i class="fas fa-check-circle me-2"></i>
+                    The application should now be running at <a href="http://localhost:5003" target="_blank">http://localhost:5003</a>
+                </div>
+
+                <h4 class="mt-4 mb-3">Troubleshooting</h4>
+                <div class="accordion" id="troubleshootingAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                Database Connection Issues
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                            <div class="accordion-body">
+                                <p>If you encounter database connection issues:</p>
+                                <ul>
+                                    <li>Verify PostgreSQL is running: <code>systemctl status postgresql</code> (Linux) or <code>brew services list</code> (macOS)</li>
+                                    <li>Check your DATABASE_URL environment variable is correctly set</li>
+                                    <li>Ensure database user has proper permissions</li>
+                                    <li>For PostgreSQL connection issues: <code>sudo -u postgres psql -c "ALTER USER scanner_user WITH PASSWORD 'your_password';"</code></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                                Subfinder/dnsx Not Found
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                            <div class="accordion-body">
+                                <p>If tools are installed but not detected:</p>
+                                <ul>
+                                    <li>Check they're properly installed: <code>which subfinder</code> and <code>which dnsx</code></li>
+                                    <li>Verify they're in your PATH: <code>echo $PATH</code></li>
+                                    <li>If not in PATH: <code>export PATH=$PATH:$(go env GOPATH)/bin</code></li>
+                                    <li>The application will still work without these tools using its built-in fallback mode</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                                Missing Python Dependencies
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                            <div class="accordion-body">
+                                <p>If you encounter module import errors:</p>
+                                <div class="code-block bg-dark text-light p-3 rounded">
+                                    <pre>pip install -r requirements.txt</pre>
+                                </div>
+                                <p>Or manually install the required packages:</p>
+                                <div class="code-block bg-dark text-light p-3 rounded">
+                                    <pre>pip install flask flask-sqlalchemy psycopg2-binary gunicorn email-validator</pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.code-block {
+    border-radius: 4px;
+    overflow-x: auto;
+}
+.code-block pre {
+    margin-bottom: 0;
+}
+</style>
+{% endblock %}
